@@ -4,6 +4,7 @@ import { types } from '../constants'
 export const initialState = {
     isLoading: false,
     questions: [],
+    interviews: [],
     shortUrl: null,
     error: null,
 }
@@ -18,12 +19,23 @@ const interviewReducer = (state = initialState, action) =>
                 draft.isLoading = false;
                 draft.error = null;
                 draft.shortUrl = action.payload;
-                console.log("User POSTed:", action.payload);
                 break;
             case types.CREATE_INTERVIEW_FAILURE:
                 draft.isLoading = false;
                 draft.error = action.payload.err;
-                console.error("Error POSTing user:", action.payload);
+                break;
+            case types.GET_INTERVIEWS_REQUEST:
+                draft.isLoading = true;
+                break;
+            case types.GET_INTERVIEWS_SUCCESS:
+                draft.isLoading = false;
+                draft.error = null;
+                console.log(action.payload)
+                draft.interviews = [...action.payload];
+                break;
+            case types.GET_INTERVIEWS_FAILURE:
+                draft.isLoading = false;
+                draft.error = action.payload.err;
                 break;
             default:
                 break;

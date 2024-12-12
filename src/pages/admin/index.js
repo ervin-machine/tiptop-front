@@ -38,7 +38,7 @@ const mapDispatchToProps = dispatch => {
       },
     createInterview: (longUrl, questions) => {
       dispatch(createInterview(longUrl, questions))
-    }
+    },
   }
 }
 

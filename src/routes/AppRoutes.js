@@ -7,8 +7,12 @@ import AdminRegister from '../features/admin/components/adminRegister';
 import AdminLogin from '../features/admin/components/adminLogin';
 import Admin from '../pages/admin';
 import InterviewAccess from '../features/candidates/components/interviewAccess';
+import InterviewList from '../features/interviews/components/interviewList';
 
 import { selectToken } from '../features/admin/store/selectors';
+
+import { fetchInterviews } from '../features/interviews/store/actions';
+import { selectInterviews } from '../features/interviews/store/selectors';
 
 // PrivateRoute Component
 const PrivateRoute = ({ token, children }) => {
@@ -20,7 +24,7 @@ const PublicRoute = ({ token, children }) => {
   return token ? <Navigate to="/dashboard" /> : children;
 };
 
-const AppRoutes = ({ token }) => {
+const AppRoutes = ({ token, fetchInterviews, interviews }) => {
   return (
     <Router>
       <Routes>
@@ -59,6 +63,15 @@ const AppRoutes = ({ token }) => {
           }
         />
 
+        <Route
+          path="/interviews"
+          element={
+            <PrivateRoute token={token}>
+              <InterviewList fetchInterviews={fetchInterviews} interviews={interviews} />
+            </PrivateRoute>
+          }
+        />
+
         {/* Default Redirect */}
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
@@ -68,6 +81,16 @@ const AppRoutes = ({ token }) => {
 
 const mapStateToProps = createStructuredSelector({
   token: selectToken(),
+  interviews: selectInterviews(),
 });
 
-export default connect(mapStateToProps)(AppRoutes);
+const mapDispatchToProps = dispatch => {
+  return {
+    fetchInterviews: () => {
+          dispatch(fetchInterviews())
+      },
+  }
+}
+
+const withConnect = connect(mapStateToProps, mapDispatchToProps)
+export default (withConnect)(AppRoutes);

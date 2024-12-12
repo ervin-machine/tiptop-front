@@ -53,7 +53,13 @@ function InterviewForm(props) {
   }
 
   const handleQuestions = () => {
-    setQuestions(questions => { return [...questions, question ]})
+    setQuestions(questions => { return [...questions, { 
+      id: (questions.length - 1) + 1,
+      question: question,
+      answer: "",
+      transcribe: "",
+      summarization: ""
+    } ]})
     setQuestion('')
   }
 
@@ -104,7 +110,7 @@ function InterviewForm(props) {
               {questions.map((question, key) => 
                 <ListItem key={key}>
                   <ListItemText
-                    primary={question}
+                    primary={question.question}
                   />
                 </ListItem>
             )}

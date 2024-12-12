@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
-import { selectQuestions } from '../../store/selectors'
-import { interviewAccess } from '../../store/actions'
+import { selectQuestions, selectTranscribe, selectSummarization, selectAudioId } from '../../store/selectors'
+import { interviewAccess, transcribeAudio, updateInterview, fetchAnswer } from '../../store/actions'
 
 import { Button } from '@mui/material'
 import Typography from '@mui/material/Typography';
@@ -13,86 +13,52 @@ import Typography from '@mui/material/Typography';
 import AudioRecorder from '../audioRecord'
 
 function InterviewAccess(props) {
-  const { interviewAccess, questions } = props;
+  const { interviewAccess, questions, transcribeAudio, updateInterview } = props;
+  const [isInterviewStarted, setIsInterviewStarted] = useState(false)
   const { shortId } = useParams();
-  const [isRecording, setIsRecording] = useState(false);
-    const [audioUrl, setAudioUrl] = useState("");
-    const [time, setTime] = useState(0);
-    const mediaRecorder = useRef(null);
-    const audioChunks = useRef([]);
-    const seconds = Math.floor((time % 6000) / 100);
 
-    const startRecording = async () => {
-        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert("Audio recording is not supported in your browser");
-            return;
-        }
-
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder.current = new MediaRecorder(stream);
-
-            mediaRecorder.current.ondataavailable = (event) => {
-                audioChunks.current.push(event.data);
-            }
-
-            mediaRecorder.current.onstop = () => {
-                const audioBlob = new Blob(audioChunks.current, { type: "audio/mp3" });
-                const url = URL.createObjectURL(audioBlob);
-                setAudioUrl(url);
-                console.log(audioBlob)
-                audioChunks.current = [];
-            };
-
-            mediaRecorder.current.start();
-            setTime(mediaRecorder.current.duration)
-            console.log(mediaRecorder.current)
-            setIsRecording(true);
-
-        } catch (err) {
-            console.log(err);
-            alert("Failed to access your microphone");
-        }
-    }
-
-    const stopRecording = () => {
-        if(mediaRecorder.current) {
-            mediaRecorder.current.stop();
-            setIsRecording(false);
-        }
-    }
-
+  const handleStartInterview = () => {
+    setIsInterviewStarted(true);
+  }
 
   useEffect(() => {
     interviewAccess(shortId);
   }, [shortId, interviewAccess])
 
-  /*useEffect(() => {
-    let intervalId;
-    if (isRecording) {
-      // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-      intervalId = setInterval(() => setTime(time + 1), 1);
-    }
-    return () => clearInterval(intervalId);
-  }, [isRecording, time]);
-*/
-
   return (
     <div style={{ textAlign: "center"}}>
-        {!isRecording && !audioUrl && <div><Typography sx={{ mt: 4, mb: 2 }} variant="h3" component="div">
+        {!isInterviewStarted ? <div><Typography sx={{ mt: 4, mb: 2 }} variant="h3" component="div">
              Welcome to the interview
         </Typography>
         <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
           Click start to access interview
         </Typography>
-        <Button onClick={startRecording} variant='contained'>START</Button></div>}
-        <AudioRecorder stopRecording={stopRecording} audioUrl={audioUrl} isRecording={isRecording} seconds={seconds} questions={questions} />
+        <Button onClick={handleStartInterview} variant='contained'>START</Button>
+        <div style={{ marginTop: "20px"}}>
+        <Typography>
+          *NOTES
+        </Typography>
+        <ul>
+          <ol>You can record answer up to 2 minutes</ol>
+          <ol>You can only re-record 2 times</ol>
+        </ul>
+        </div>
+        </div> :
+        <AudioRecorder 
+          questions={questions} 
+          transcribeAudio={transcribeAudio} 
+          updateInterview={updateInterview}
+          shortId={shortId}
+        />}
     </div>
   )
 }
 
 const mapStateToProps = createStructuredSelector({
-    questions: selectQuestions()
+    questions: selectQuestions(),
+    transcribe: selectTranscribe(),
+    summarization: selectSummarization(),
+    audioID: selectAudioId()
   })
   
   const mapDispatchToProps = dispatch => {
@@ -100,6 +66,15 @@ const mapStateToProps = createStructuredSelector({
         interviewAccess: (shortId) => {
             dispatch(interviewAccess(shortId))
         },
+        transcribeAudio: (formData, activeStep, questions) => {
+          dispatch(transcribeAudio(formData, activeStep, questions))
+        },
+        updateInterview: (shortId, questions) => {
+          dispatch(updateInterview(shortId, questions))
+        },
+        fetchAnswer: (questions) => {
+          dispatch(fetchAnswer(questions))
+        }
     }
   }
   

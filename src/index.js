@@ -13,6 +13,7 @@ const MOUNT_NODE = document.getElementById('root');
 const root = ReactDOM.createRoot(MOUNT_NODE);
 
 root.render(
+  
   <Provider store={store}>
     <ConnectedRouter history={history}> {/* Ensure history is passed here */}
       <App />
