@@ -116,8 +116,8 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
   
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ bgcolor: "#cfe8fc", height: "100vh", padding: 3 }}>
+    <Container>
+      <Box className="audio-record-content">
         {/* Stepper */}
         <Stepper activeStep={activeStep}>
           {questions.map((_, index) => (
@@ -141,7 +141,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
               <div className="timebox">
                 <CountdownCircleTimer
                   {...timerProps}
-                  colors={[["#6a0dad", 0], ["#9000ff", 1]]}
+                  colors={[["#000000", 0], ["#9000ff", 1]]}
                   isLinearGradient
                   duration={seconds}
                   initialRemainingTime={120 - seconds}
