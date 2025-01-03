@@ -4,7 +4,8 @@ import { types } from '../constants'
 export const initialState = {
     isLoading: false,
     token: localStorage.getItem('token') || null,
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    auth: JSON.parse(localStorage.getItem('user')) || null,
+    avatar: null,
     error: null,
 }
 
@@ -18,7 +19,7 @@ const adminReducer = (state = initialState, action) =>
             case types.LOGIN_USER_SUCCESS:
             case types.REGISTER_USER_SUCCESS:
                 draft.isLoading = false;
-                draft.user = action.payload.user // Directly assigning the user object
+                draft.auth = action.payload.user // Directly assigning the user object
                 draft.token = action.payload.token;
                 draft.error = null;
                 break;
@@ -27,8 +28,20 @@ const adminReducer = (state = initialState, action) =>
                 draft.isLoading = false;
                 draft.error = action.payload.err;
                 break;
+            case types.UPLOAD_AVATAR_REQUEST:
+                draft.isLoading = true;
+                break;
+            case types.UPLOAD_AVATAR_SUCCESS:
+                draft.isLoading = false;
+                draft.avatar = action.payload
+                draft.error = null;
+                break;
+            case types.UPLOAD_AVATAR_FAILURE:
+                draft.isLoading = false;
+                draft.error = action.payload.err;
+                break;
             case types.LOGOUT_USER_SUCCESS:
-                draft.user = null;
+                draft.auth = null;
                 draft.token = null;
                 draft.error = null;
                 break;

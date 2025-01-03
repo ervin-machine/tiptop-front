@@ -9,26 +9,34 @@ import HeaderLayout from '../../layouts/HeaderLayout.js'
 
 import Dashboard from '../../features/admin/components/dashboard'
 
-import { selectUser } from '../../features/admin/store/selectors'
+import { selectAuth } from '../../features/admin/store/selectors'
 import { logoutUser } from '../../features/admin/store/actions'
 
-import { createInterview } from '../../features/interviews/store/actions/index.js'
-import { selectShortUrl } from '../../features/interviews/store/selectors/index.js'
+import { createInterview, createInterviewTemplate, fetchInterviewTemplates } from '../../features/interviews/store/actions/index.js'
+import { selectShortUrl, selectInterviewTemplates } from '../../features/interviews/store/selectors/index.js'
 
 function Admin(props) {
-  const { user, logoutUser, createInterview, shortUrl } = props;
+  const { auth, logoutUser, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates } = props;
 
   return (
     <AdminLayout>
         <HeaderLayout logoutUser={logoutUser} />
-        <Dashboard user={user} createInterview={createInterview} shortUrl={shortUrl} />
+        <Dashboard 
+          auth={auth} 
+          createInterview={createInterview} 
+          shortUrl={shortUrl} 
+          createInterviewTemplate={createInterviewTemplate} 
+          fetchInterviewTemplates={fetchInterviewTemplates}
+          interviewTemplates={interviewTemplates}
+        />
     </AdminLayout>
   )
 }
 
 const mapStateToProps = createStructuredSelector({
-  user: selectUser(),
-  shortUrl: selectShortUrl()
+  auth: selectAuth(),
+  shortUrl: selectShortUrl(),
+  interviewTemplates: selectInterviewTemplates()
 })
 
 const mapDispatchToProps = dispatch => {
@@ -36,9 +44,15 @@ const mapDispatchToProps = dispatch => {
     logoutUser: () => {
           dispatch(logoutUser())
       },
-    createInterview: (longUrl, questions) => {
-      dispatch(createInterview(longUrl, questions))
+    createInterview: (userId, candidatePosition, candidateFirstName, candidateLastName, candidateEmail, longUrl, questions) => {
+      dispatch(createInterview(userId, candidatePosition, candidateFirstName, candidateLastName, candidateEmail, longUrl, questions))
     },
+    createInterviewTemplate: (userId, candidatePosition, questions) => {
+      dispatch(createInterviewTemplate(userId, candidatePosition, questions))
+    },
+    fetchInterviewTemplates: (userId) => {
+      dispatch(fetchInterviewTemplates(userId))
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 import { setAuthToken } from '../../../../utils/api'
-import { userLogin, userRegister } from '../../hooks'
+import { userLogin, userRegister, changePassword, uploadAvatar } from '../../hooks'
 import { types } from "../constants"
 
 
@@ -39,6 +39,45 @@ const registerUserRequest = () => {
   const loginUserFailure = (err) => {
     return {
         type: types.LOGIN_USER_FAILURE,
+        payload: err
+    }
+  }
+
+  const changePasswordRequest = () => {
+    return {
+        type: types.CHANGE_PASSWORD_REQUEST
+    }
+  }
+  
+  const changePasswordSuccess = () => {
+    return {
+        type: types.CHANGE_PASSWORD_SUCCESS,
+    }
+  }
+  
+  const changePasswordFailure = (err) => {
+    return {
+        type: types.CHANGE_PASSWORD_FAILURE,
+        payload: err
+    }
+  }
+
+  const uploadAvatarRequest = () => {
+    return {
+        type: types.UPLOAD_AVATAR_REQUEST
+    }
+  }
+  
+  const uploadAvatarSuccess = (avatar) => {
+    return {
+        type: types.UPLOAD_AVATAR_SUCCESS,
+        data: avatar
+    }
+  }
+  
+  const uploadAvatarFailure = (err) => {
+    return {
+        type: types.UPLOAD_AVATAR_FAILURE,
         payload: err
     }
   }
@@ -92,6 +131,18 @@ export const loginUser = (email, password) => {
     }
   }
   
+  export const updatePassword = (_id, currentPassword, newPassword) => {
+    return async (dispatch) => {
+        dispatch(changePasswordRequest())
+        try {
+            await changePassword(_id, currentPassword, newPassword);
+  
+            dispatch(changePasswordSuccess())
+        } catch(err) {
+            dispatch(changePasswordFailure(err))
+        }
+    }
+  }
 
   export const logoutUser = () => {
     return async (dispatch) => {
@@ -104,6 +155,19 @@ export const loginUser = (email, password) => {
             logoutUserSuccess();
         } catch(err) {
             dispatch(logoutUserFailure(err))
+        }
+    }
+  }
+
+export const avatarUpload = (file) => {
+    return async (dispatch) => {
+        dispatch(uploadAvatarRequest())
+        try {
+            const response  = await uploadAvatar(file);
+  
+            dispatch(uploadAvatarSuccess(response.data.avatar))
+        } catch(err) {
+            dispatch(uploadAvatarFailure(err))
         }
     }
   }

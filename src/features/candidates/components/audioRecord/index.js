@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useParams } from 'react-router-dom'
+import { useParams } from "react-router-dom";
 import "./audioRecord.scss";
 import { Typography, Button, Container, Box, Stepper, Step, StepLabel } from "@mui/material";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
@@ -18,6 +18,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
   const [audioBlob, setAudioBlob] = useState(null);
   const [recordCount, setRecordCount] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [timer, setTimer] = useState(120)
   const { shortId } = useParams();
 
   // References
@@ -49,6 +50,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
       mediaRecorder.current.start();
       setIsRecording(true);
       setSeconds(0);
+      setTimer((prevKey) => prevKey + 1)
 
       recordingTimeoutRef.current = setTimeout(stopRecording, 120000); // Stop after 120 seconds
     } catch (err) {
@@ -63,6 +65,9 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
     setIsRecording(false);
     setRecordCount((prev) => prev + 1);
     clearTimeout(recordingTimeoutRef.current);
+
+    const timestamp = new Date().getTime();
+    localStorage.setItem("recordCount", JSON.stringify({ recordCount: recordCount, timestamp }));
   };
 
   // Handle Navigation to Next Question
@@ -72,10 +77,17 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
     formData.append("audio", audioBlob);
 
     setActiveStep(nextStep);
-    setCurrentQuestion(questions[nextStep]);
     setRecordCount(0);
     setSeconds(0);
+    setTimer(0)
     transcribeAudio(formData, activeStep, questions);
+    setAudioBlob(null);
+
+    if (nextStep === questions.length) {
+      updateInterview(shortId, questions); // Update interview on completion
+    }
+
+    localStorage.setItem("activeStep", JSON.stringify({ step: nextStep }));
   };
 
   // Initialize the First Question
@@ -89,7 +101,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
   useEffect(() => {
     let timer;
     if (isRecording) {
-      timer = setInterval(() => setSeconds((prev) => prev + 1), 1000);
+      timer = setInterval(() => setSeconds((prev) => prev + 1), 970);
     }
 
     if (seconds >= 120) {
@@ -99,13 +111,31 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
     return () => clearInterval(timer);
   }, [isRecording, seconds]);
 
+  // Update Current Question on Active Step Change
   useEffect(() => {
-    if(questions[questions.length - 1]?.transcribe?.length > 1) {
-      console.log(questions[questions.length - 1]?.transcribe)
-      console.log("test")
-      updateInterview(shortId, questions)
+    setCurrentQuestion(questions[activeStep]);
+  }, [activeStep, questions]);
+
+  // Debounce UpdateInterview
+  const debounce = (func, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => func(...args), delay);
+    };
+  };
+
+  const debouncedUpdateInterview = useCallback(
+    debounce(updateInterview, 1000),
+    [updateInterview]
+  );
+
+  useEffect(() => {
+    const lastQuestion = questions[questions.length - 1];
+    if (lastQuestion?.transcribe && lastQuestion.transcribe.length > 1) {
+      debouncedUpdateInterview(shortId, questions);
     }
-  }, [questions, shortId, updateInterview])
+  }, [questions[questions.length - 1]?.transcribe, shortId, debouncedUpdateInterview]);
 
   // Format Time Display
   const formatTime = useCallback((time) => {
@@ -113,7 +143,32 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
     const secs = time % 60;
     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   }, []);
+
+  useEffect(() => {
+    // Check for Expired Active Step on Mount
+    const checkActiveStepExpiration = () => {
+      const savedActiveStep = localStorage.getItem("activeStep");
+      const savedRecordCount = localStorage.getItem("recordCount");
+      console.log(savedActiveStep, savedRecordCount)
+
+      if (savedActiveStep || savedRecordCount) {
+        const { step } = JSON.parse(savedActiveStep);
+        const { recordCount, timestamp } = JSON.parse(savedRecordCount);
+        const currentTime = new Date().getTime();
   
+        // Remove if more than 1 minute (60,000 milliseconds) has passed
+        if (currentTime - timestamp > 300000) {
+          localStorage.removeItem("activeStep");
+          localStorage.removeItem("recordCount");
+        } else {
+          setActiveStep(step);
+          setRecordCount(recordCount)
+        }
+      }
+    };
+  
+    checkActiveStepExpiration();
+  }, []);
 
   return (
     <Container>
@@ -130,9 +185,10 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
         {/* Main Content */}
         {activeStep === questions.length ? (
           <div>
-            <Typography sx={{ mt: 2, mb: 1 }}>All questions completed - you&apos;re finished!</Typography>
+            <Typography sx={{ mt: 2, mb: 1 }}>
+              All questions completed - you&apos;re finished!
+            </Typography>
           </div>
-          
         ) : (
           <>
             <Typography sx={{ mt: 2, mb: 1 }}>{currentQuestion?.question}</Typography>
@@ -141,9 +197,11 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
               <div className="timebox">
                 <CountdownCircleTimer
                   {...timerProps}
-                  colors={[["#000000", 0], ["#9000ff", 1]]}
+                  key={timer}
+                  isPlaying={isRecording}
+                  colors={[["#1976d2", 0]]}
                   isLinearGradient
-                  duration={seconds}
+                  duration={120}
                   initialRemainingTime={120 - seconds}
                   trailColor="#bbb"
                 >
@@ -162,7 +220,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
             </Button>
 
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button onClick={handleNext} variant="contained" disabled={isRecording}>
+              <Button onClick={handleNext} variant="contained" disabled={!audioBlob}>
                 {activeStep === questions.length - 1 ? "Finish" : "Next"}
               </Button>
             </Box>

@@ -1,0 +1,77 @@
+.profile-info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-info-content {
+    display: flex;
+}
+
+.profile-information {
+    display: flex;
+    justify-content: space-around;
+}
+
+.profile-head {
+    line-height: 0;
+    font-size: 21px;
+    color: #1976d2;
+}
+
+.profile-subhead {
+    line-height: 0;
+    font-size: 18px;
+    color: #bbb;
+}
+
+.profile-text {
+    line-height: 0;
+    font-size: 17px;
+    color: #bbb;
+}
+
+.profile-info-head {
+    line-height: 0;
+    font-size: 16px;
+    color: #bbb;
+}
+
+.profile-info-text {
+    line-height: 0.5;
+    font-size: 18px;
+    color: #1976d2;
+}
+
+.ml-20 {
+    margin-left: 20px;
+}
+
+.profile-card-head {
+    color: #1976d2;
+}
+
+.change-password-input {
+    margin: 10px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid black;
+    width: 250px;
+    padding: 10px;
+}
+
+.update-btn {
+    border-radius: 20px !important;
+    width: 100px;
+    text-align: center;
+    margin: 10px !important;
+}
+
+.edit-input {
+    margin: 10px;
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid black;
+    width: 250px;
+    padding: 10px;
+}

@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 
-import InterviewForm from '../../../interviews/components/interviewForm';
+import InterviewCreate from '../../../interviews/components/interviewCreate';
 
-const Dashboard = ({ createInterview, shortUrl }) => {
-  const [isFormOpen, setFormOpen] = useState(false);
+const Dashboard = ({ auth, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates }) => {
+  const [isInterviewCreateOpen, setInterviewCreateOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleOpenForm = () => setFormOpen(true);
-  const handleCloseForm = () => setFormOpen(false);
+  const handleOpenInterviewCreate = () => setInterviewCreateOpen(true);
+  const handleCloseInterviewCreate = () => setInterviewCreateOpen(false);
 
   const handleInterviewList = () => {
     navigate('/interviews');
@@ -32,7 +32,7 @@ const Dashboard = ({ createInterview, shortUrl }) => {
       >
         <Button
           sx={{ width: '200px', height: '50px' }}
-          onClick={handleOpenForm}
+          onClick={handleOpenInterviewCreate}
           variant="contained"
         >
           Create Interview
@@ -46,12 +46,17 @@ const Dashboard = ({ createInterview, shortUrl }) => {
         </Button>
       </Stack>
 
-      <InterviewForm
-        open={isFormOpen}
-        handleClose={handleCloseForm}
+      <InterviewCreate 
+        open={isInterviewCreateOpen}
+        handleClose={handleCloseInterviewCreate} 
         createInterview={createInterview}
         shortUrl={shortUrl}
+        auth={auth}
+        createInterviewTemplate={createInterviewTemplate}
+        fetchInterviewTemplates={fetchInterviewTemplates}
+        interviewTemplates={interviewTemplates}
       />
+      
     </div>
   );
 };

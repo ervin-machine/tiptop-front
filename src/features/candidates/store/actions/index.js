@@ -87,8 +87,7 @@ export const interviewAccess = (shortId) => {
         dispatch(interviewAccessRequest())
         try {
             const response = await getInterviewAccess(shortId);
-            const interview = response.data;
-
+            const interview = response.data.interview;
             dispatch(interviewAccessSuccess(interview))
         } catch(err) {
             dispatch(interviewAccessFailure(err))
@@ -114,14 +113,13 @@ export const transcribeAudio = (formData, activeStep, questions) => {
         dispatch(transcribeRequest())
         try {
             const uploadResponse = await uploadAudio(formData)
-
-            const transcriptId = uploadResponse.data.transcriptId;
-            const audioID = uploadResponse.data.audioID;
+            const transcriptId = uploadResponse.data.result.transcriptId;
+            const audioID = uploadResponse.data.result.audioID;
 
             let transcriptionData;
             do {
                 const response = await getTransccribe(transcriptId);
-                transcriptionData = response.data;
+                transcriptionData = response.data.data;
             } while (transcriptionData.status !== "completed");
 
             if(transcriptionData.status === "completed") {
@@ -156,8 +154,6 @@ export const fetchAnswer = (questions) => {
                     };
                 })
             );
-
-            console.log(updatedQuestions)
 
             dispatch(fetchAnswerSuccess({updatedQuestions: updatedQuestions }))
         } catch(err) {

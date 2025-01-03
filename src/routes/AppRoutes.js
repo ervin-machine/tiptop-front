@@ -6,13 +6,14 @@ import { createStructuredSelector } from 'reselect';
 import AdminRegister from '../features/admin/components/adminRegister';
 import AdminLogin from '../features/admin/components/adminLogin';
 import Admin from '../pages/admin';
+import Profile from '../pages/profile';
 import InterviewAccess from '../features/candidates/components/interviewAccess';
 import InterviewList from '../features/interviews/components/interviewList';
 
-import { selectToken } from '../features/admin/store/selectors';
+import { selectToken, selectAuth } from '../features/admin/store/selectors';
 
-import { fetchInterviews } from '../features/interviews/store/actions';
-import { selectInterviews } from '../features/interviews/store/selectors';
+import { fetchInterviews, deleteInterview, fetchInterview, updateInterview } from '../features/interviews/store/actions';
+import { selectInterviews, selectInterview } from '../features/interviews/store/selectors';
 
 // PrivateRoute Component
 const PrivateRoute = ({ token, children }) => {
@@ -24,7 +25,7 @@ const PublicRoute = ({ token, children }) => {
   return token ? <Navigate to="/dashboard" /> : children;
 };
 
-const AppRoutes = ({ token, fetchInterviews, interviews }) => {
+const AppRoutes = ({ token, fetchInterviews, interviews, user, deleteInterview, interview, fetchInterview, updateInterview }) => {
   return (
     <Router>
       <Routes>
@@ -67,7 +68,24 @@ const AppRoutes = ({ token, fetchInterviews, interviews }) => {
           path="/interviews"
           element={
             <PrivateRoute token={token}>
-              <InterviewList fetchInterviews={fetchInterviews} interviews={interviews} />
+              <InterviewList 
+                fetchInterviews={fetchInterviews} 
+                interviews={interviews} 
+                user={user} 
+                deleteInterview={deleteInterview} 
+                interview={interview}
+                fetchInterview={fetchInterview}
+                updateInterview={updateInterview}
+              />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute token={token}>
+              <Profile />
             </PrivateRoute>
           }
         />
@@ -82,13 +100,24 @@ const AppRoutes = ({ token, fetchInterviews, interviews }) => {
 const mapStateToProps = createStructuredSelector({
   token: selectToken(),
   interviews: selectInterviews(),
+  user: selectAuth(),
+  interview: selectInterview()
 });
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchInterviews: () => {
-          dispatch(fetchInterviews())
+    fetchInterviews: (userID) => {
+        dispatch(fetchInterviews(userID))
       },
+    deleteInterview: (shortId) => {
+        dispatch(deleteInterview(shortId))
+    },
+    fetchInterview: (shortId) => {
+      dispatch(fetchInterview(shortId))
+    },
+    updateInterview: (interview) => {
+      dispatch(updateInterview(interview))
+    }
   }
 }
 

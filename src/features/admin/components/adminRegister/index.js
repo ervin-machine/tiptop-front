@@ -9,14 +9,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
 
-import { registerUser } from '../../store/actions';
+import { registerUser, avatarUpload } from '../../store/actions';
+import { selectAvatar } from '../../store/selectors';
 
-const AdminRegister = ({ registerUser }) => {
+const AdminRegister = ({ registerUser, avatarUpload, avatar }) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
     try {
-      registerUser(values.firstName, values.lastName, values.email, values.password);
+      registerUser(values.firstName, values.lastName, values.email, values.password, values.phone, values.companyName, values.companyPosition);
       navigate('/login');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -38,10 +39,14 @@ const AdminRegister = ({ registerUser }) => {
 
         <Formik
           initialValues={{
+            avatar: null,
             firstName: '',
             lastName: '',
             email: '',
             password: '',
+            phone: '',
+            companyName: '',
+            companyPosition: ''
           }}
           onSubmit={handleSubmit}
         >
@@ -69,14 +74,37 @@ const AdminRegister = ({ registerUser }) => {
                   placeholder="jane@acme.com"
                   type="email"
                 />
-              </div>
-              <div>
                 <Field
                   id="password"
                   className="register-input"
                   name="password"
                   placeholder="Your password"
                   type="password"
+                />
+              </div>
+              <div>
+                <Field
+                  id="phone"
+                  className="register-input"
+                  name="phone"
+                  placeholder="Your phone"
+                  type="string"
+                />
+                <Field
+                  id="companyName"
+                  className="register-input"
+                  name="companyName"
+                  placeholder="Company name"
+                  type="string"
+                />
+              </div>
+              <div>
+                <Field
+                  id="companyPosition"
+                  className="register-input"
+                  name="companyPosition"
+                  placeholder="Your position"
+                  type="string"
                 />
               </div>
               <Button className="register-btn" type="submit" variant="contained">
@@ -90,11 +118,16 @@ const AdminRegister = ({ registerUser }) => {
   );
 };
 
-const mapStateToProps = createStructuredSelector({});
+const mapStateToProps = createStructuredSelector({
+  avatar: selectAvatar(),
+});
 
 const mapDispatchToProps = (dispatch) => ({
   registerUser: (firstName, lastName, email, password) =>
     dispatch(registerUser(firstName, lastName, email, password)),
+  avatarUpload: (file) => {
+    dispatch(avatarUpload(file))
+  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdminRegister);

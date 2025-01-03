@@ -19,17 +19,42 @@ function InterviewAccess(props) {
 
   const handleStartInterview = () => {
     setIsInterviewStarted(true);
+    const timestamp = new Date().getTime();
+    localStorage.setItem("isInterviewStarted", JSON.stringify({ isInterviewStarted: true, timestamp }));
   }
 
   useEffect(() => {
     interviewAccess(shortId);
+
   }, [shortId, interviewAccess])
+  
+    useEffect(() => {
+      // Check for Expired Active Step on Mount
+      const checkActiveStepExpiration = () => {
+        const savedIsInterviewStarted = localStorage.getItem("isInterviewStarted");
+  
+        if (savedIsInterviewStarted) {
+          const { isInterviewStarted, timestamp } = JSON.parse(savedIsInterviewStarted);
+          const currentTime = new Date().getTime();
+          // Remove if more than 1 minute (60,000 milliseconds) has passed
+          if (currentTime - timestamp > 300000) {
+            localStorage.removeItem("isInterviewStarted");
+          } else {
+            console.log(isInterviewStarted)
+            setIsInterviewStarted(isInterviewStarted)
+          }
+        }
+      };
+    
+      checkActiveStepExpiration();
+    }, []);
 
   return (
     <div style={{ textAlign: "center"}}>
-        {!isInterviewStarted ? <div><Typography sx={{ mt: 4, mb: 2 }} variant="h3" component="div">
+        {!isInterviewStarted ? <div>
+          <Typography sx={{ mt: 4, mb: 2 }} variant="h3" component="div">
              Welcome to the interview
-        </Typography>
+          </Typography>
         <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
           Click start to access interview
         </Typography>

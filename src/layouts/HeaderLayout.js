@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -21,6 +22,7 @@ function HeaderLayout(props) {
     const { logoutUser } = props;
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const navigate = useNavigate();
 
     const handleOpenNavMenu = (event) => {
       setAnchorElNav(event.currentTarget);
@@ -35,6 +37,7 @@ function HeaderLayout(props) {
 
     const handleCloseUserMenu = () => {
       setAnchorElUser(null);
+      navigate('/profile')
     };
 
     const handleSettings = (setting) => {
@@ -54,7 +57,7 @@ function HeaderLayout(props) {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/dashboard"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },

@@ -18,7 +18,7 @@ const candidateReducer = (state = initialState, action) =>
                 break;
             case types.FETCH_INTERVIEW_ACCESS_LINK_SUCCESS:
                 draft.isLoading = false;
-                draft.questions = action.payload // Directly assigning the user object
+                draft.questions = [...action.payload.questions] // Directly assigning the user object
                 draft.error = null;
                 break;
             case types.FETCH_INTERVIEW_ACCESS_LINK_FAILURE:
