@@ -9,10 +9,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
 
-import { registerUser, avatarUpload } from '../../store/actions';
+import { registerUser } from '../../store/actions';
 import { selectAvatar } from '../../store/selectors';
 
-const AdminRegister = ({ registerUser, avatarUpload, avatar }) => {
+import { registerSchema } from '../../schemas/registerSchema';
+
+const AdminRegister = ({ registerUser }) => {
   const navigate = useNavigate();
 
   const handleSubmit = async (values) => {
@@ -47,57 +49,95 @@ const AdminRegister = ({ registerUser, avatarUpload, avatar }) => {
             phone: '',
             companyName: '',
             companyPosition: ''
-          }}
+          }}cccc
+          validationSchema={registerSchema}
           onSubmit={handleSubmit}
         >
-          {() => (
+          {({ errors, touched }) => (
             <Form>
-              <Field
-                id="firstName"
-                className="register-input"
-                name="firstName"
-                placeholder="First Name"
-                type="text"
-              />
-              <Field
-                id="lastName"
-                className="register-input"
-                name="lastName"
-                placeholder="Last Name"
-                type="text"
-              />
-              <div>
-                <Field
-                  id="email"
-                  className="register-input"
-                  name="email"
-                  placeholder="jane@acme.com"
-                  type="email"
-                />
-                <Field
-                  id="password"
-                  className="register-input"
-                  name="password"
-                  placeholder="Your password"
-                  type="password"
-                />
+              <div style={{ display: "flex" }}>
+                <div>
+                  <Field
+                    id="firstName"
+                    className="register-input"
+                    name="firstName"
+                    placeholder="First Name"
+                    type="text"
+                  />
+                  {errors.firstName && touched.firstName ? (
+                  <div>
+                    {errors.firstName}</div>
+                  ) : null}
+                </div>
+                <div>
+                  <Field
+                    id="lastName"
+                    className="register-input"
+                    name="lastName"
+                    placeholder="Last Name"
+                    type="text"
+                  />
+                  {errors.lastName && touched.lastName ? (
+                     <div>{errors.lastName}</div>
+                  ) : null}
+                </div>
               </div>
-              <div>
-                <Field
-                  id="phone"
-                  className="register-input"
-                  name="phone"
-                  placeholder="Your phone"
-                  type="string"
-                />
-                <Field
-                  id="companyName"
-                  className="register-input"
-                  name="companyName"
-                  placeholder="Company name"
-                  type="string"
-                />
+              
+              <div style={{ display: "flex" }}>
+                <div>
+                    <Field
+                      id="email"
+                      className="register-input"
+                      name="email"
+                      placeholder="jane@acme.com"
+                      type="email"
+                    />
+                    {errors.email && touched.email ? (
+                      <div>{errors.email}</div>
+                    ) : null}
+                </div>
+                <div>
+                  <Field
+                    id="password"
+                    className="register-input"
+                    name="password"
+                    placeholder="Your password"
+                    type="password"
+                  />
+                  {errors.password && touched.password ? (
+                    <div>{errors.password}</div>
+                  ) : null}
+                </div>
               </div>
+              
+              <div style={{ display: "flex" }}>
+                <div>
+                  <Field
+                    id="phone"
+                    className="register-input"
+                    name="phone"
+                    placeholder="Your phone"
+                    type="string"
+                  />
+                  {errors.phone && touched.phone ? (
+                    <div>{errors.phone}</div>
+                  ) : null}
+                </div>
+                <div>
+                  <Field
+                    id="companyName"
+                    className="register-input"
+                    name="companyName"
+                    placeholder="Company name"
+                    type="string"
+                  />
+                  {errors.companyName && touched.companyName ? (
+                    <div>{errors.companyName}</div>
+                  ) : null}
+                </div>
+                
+              </div>
+
               <div>
                 <Field
                   id="companyPosition"
@@ -106,6 +146,9 @@ const AdminRegister = ({ registerUser, avatarUpload, avatar }) => {
                   placeholder="Your position"
                   type="string"
                 />
+                {errors.companyPosition && touched.companyPosition ? (
+                  <div>{errors.companyPosition}</div>
+                ) : null}
               </div>
               <Button className="register-btn" type="submit" variant="contained">
                 Register
@@ -123,11 +166,8 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  registerUser: (firstName, lastName, email, password) =>
-    dispatch(registerUser(firstName, lastName, email, password)),
-  avatarUpload: (file) => {
-    dispatch(avatarUpload(file))
-  }
+  registerUser: (firstName, lastName, email, password, phone, companyName, companyPosition) =>
+    dispatch(registerUser(firstName, lastName, email, password, phone, companyName, companyPosition)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdminRegister);

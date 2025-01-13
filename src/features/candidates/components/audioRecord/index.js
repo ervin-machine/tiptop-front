@@ -68,6 +68,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
 
     const timestamp = new Date().getTime();
     localStorage.setItem("recordCount", JSON.stringify({ recordCount: recordCount, timestamp }));
+    localStorage.setItem("activeStep", JSON.stringify({ step: activeStep }));
   };
 
   // Handle Navigation to Next Question
@@ -216,7 +217,7 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
               sx={{ mb: 2 }}
               disabled={recordCount === 3}
             >
-              {isRecording ? "Stop Answering" : "Answer Question"}
+              {isRecording ? "Stop Answering" : recordCount === 0 ? "Answer Question" : "Re-record"}
             </Button>
 
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>

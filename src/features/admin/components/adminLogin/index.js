@@ -7,7 +7,7 @@ import { Formik, Field, Form } from 'formik';
 import { useNavigate, Link } from 'react-router-dom';
 
 import { loginUser } from '../../store/actions';
-import { LoginSchema } from '../../schemas';
+import { LoginSchema } from '../../schemas/loginSchema';
 
 import Typography from '@mui/material/Typography';
 import { Button } from '@mui/material';
@@ -46,7 +46,7 @@ const AdminLogin = ({ loginUser }) => {
           validationSchema={LoginSchema}
           onSubmit={handleSubmit}
         >
-          {() => (
+          {({ errors, touched }) => (
             <Form>
               <div>
                 <Field
@@ -56,6 +56,9 @@ const AdminLogin = ({ loginUser }) => {
                   placeholder="jane@acme.com"
                   type="email"
                 />
+                {errors.email && touched.email ? (
+                  <div>{errors.email}</div>
+                  ) : null}
               </div>
               <div>
                 <Field
@@ -65,6 +68,9 @@ const AdminLogin = ({ loginUser }) => {
                   placeholder="Your password"
                   type="password"
                 />
+                {errors.password && touched.password ? (
+                  <div>{errors.password}</div>
+                  ) : null}
               </div>
               <Button className="login-btn" type="submit" variant="contained">
                 Log In

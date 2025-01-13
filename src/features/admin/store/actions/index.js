@@ -1,5 +1,5 @@
 import { setAuthToken } from '../../../../utils/api'
-import { userLogin, userRegister, changePassword, uploadAvatar } from '../../hooks'
+import { userLogin, userRegister, changePassword } from '../../hooks'
 import { types } from "../constants"
 
 
@@ -62,26 +62,6 @@ const registerUserRequest = () => {
     }
   }
 
-  const uploadAvatarRequest = () => {
-    return {
-        type: types.UPLOAD_AVATAR_REQUEST
-    }
-  }
-  
-  const uploadAvatarSuccess = (avatar) => {
-    return {
-        type: types.UPLOAD_AVATAR_SUCCESS,
-        data: avatar
-    }
-  }
-  
-  const uploadAvatarFailure = (err) => {
-    return {
-        type: types.UPLOAD_AVATAR_FAILURE,
-        payload: err
-    }
-  }
-
   const logoutUserSuccess = () => {
     return {
         type: types.LOGOUT_USER_SUCCESS
@@ -95,11 +75,11 @@ const registerUserRequest = () => {
     }
   }
 
-export const registerUser = (firstName, lastName, email, password) => {
+export const registerUser = (firstName, lastName, email, password, phone, companyName, companyPosition) => {
     return async (dispatch) => {
         dispatch(registerUserRequest())
         try {
-            const response = await userRegister(firstName, lastName, email, password);
+            const response = await userRegister(firstName, lastName, email, password, phone, companyName, companyPosition);
             const { token, user } = response.data;
 
             localStorage.setItem('token', token);
@@ -155,19 +135,6 @@ export const loginUser = (email, password) => {
             logoutUserSuccess();
         } catch(err) {
             dispatch(logoutUserFailure(err))
-        }
-    }
-  }
-
-export const avatarUpload = (file) => {
-    return async (dispatch) => {
-        dispatch(uploadAvatarRequest())
-        try {
-            const response  = await uploadAvatar(file);
-  
-            dispatch(uploadAvatarSuccess(response.data.avatar))
-        } catch(err) {
-            dispatch(uploadAvatarFailure(err))
         }
     }
   }

@@ -36,7 +36,7 @@ const style = {
   }));
 
 function InterviewCreate(props) {
-  const { handleClose, open, auth, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates } = props
+  const { handleClose, open, auth, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates, checkInterview, isInterviewExist } = props
 
   const [isFormOpen, setFormOpen] = useState(false);
   const [interviewTemplate, setInterviewTemplate] = useState(null);
@@ -86,6 +86,8 @@ function InterviewCreate(props) {
                 createInterviewTemplate={createInterviewTemplate}
                 interviewTemplate={interviewTemplate}
                 handleCloseInterviewCreate={handleClose}
+                checkInterview={checkInterview}
+                isInterviewExist={isInterviewExist}
             />
         </Box>
       </Modal>

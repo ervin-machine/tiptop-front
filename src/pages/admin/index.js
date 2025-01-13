@@ -12,11 +12,11 @@ import Dashboard from '../../features/admin/components/dashboard'
 import { selectAuth } from '../../features/admin/store/selectors'
 import { logoutUser } from '../../features/admin/store/actions'
 
-import { createInterview, createInterviewTemplate, fetchInterviewTemplates } from '../../features/interviews/store/actions/index.js'
-import { selectShortUrl, selectInterviewTemplates } from '../../features/interviews/store/selectors/index.js'
+import { createInterview, createInterviewTemplate, fetchInterviewTemplates, checkInterview } from '../../features/interviews/store/actions/index.js'
+import { selectShortUrl, selectInterviewTemplates, selectisInterviewExist } from '../../features/interviews/store/selectors/index.js'
 
 function Admin(props) {
-  const { auth, logoutUser, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates } = props;
+  const { auth, logoutUser, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates, checkInterview, isInterviewExist } = props;
 
   return (
     <AdminLayout>
@@ -28,6 +28,8 @@ function Admin(props) {
           createInterviewTemplate={createInterviewTemplate} 
           fetchInterviewTemplates={fetchInterviewTemplates}
           interviewTemplates={interviewTemplates}
+          checkInterview={checkInterview}
+          isInterviewExist={isInterviewExist}
         />
     </AdminLayout>
   )
@@ -36,7 +38,8 @@ function Admin(props) {
 const mapStateToProps = createStructuredSelector({
   auth: selectAuth(),
   shortUrl: selectShortUrl(),
-  interviewTemplates: selectInterviewTemplates()
+  interviewTemplates: selectInterviewTemplates(),
+  isInterviewExist: selectisInterviewExist()
 })
 
 const mapDispatchToProps = dispatch => {
@@ -52,6 +55,9 @@ const mapDispatchToProps = dispatch => {
     },
     fetchInterviewTemplates: (userId) => {
       dispatch(fetchInterviewTemplates(userId))
+    },
+    checkInterview: (interview) => {
+      dispatch(checkInterview(interview))
     }
   }
 }

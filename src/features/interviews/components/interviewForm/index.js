@@ -15,6 +15,10 @@ import Stack from '@mui/material/Stack';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 
+import { InterviewSchema } from '../../schemas/interviewSchema';
+
+import InterviewTemplateCreate from '../interviewTemplateCreate';
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -33,10 +37,14 @@ const style = {
 };
 
 function InterviewForm(props) {
-  const { auth, open, handleClose, createInterview, shortUrl, createInterviewTemplate, interviewTemplate, handleCloseInterviewCreate } = props;
+  const { auth, open, handleClose, createInterview, shortUrl, createInterviewTemplate, interviewTemplate, handleCloseInterviewCreate, checkInterview, isInterviewExist } = props;
   const [question, setQuestion] = useState('');
   const [questions, setQuestions] = useState([]);
   const [isCreated, setIsCreated] = useState(false);
+  const [isInterviewTemplateOpen, setIsInterviewTemplateOpen] = useState(false);
+  const [values, setValues] = useState(null)
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false)
+  const [questionsError, setQuestionError] = useState("");
 
   const makeID = () => {
     let result = '';
@@ -81,13 +89,43 @@ function InterviewForm(props) {
     handleClose();
     setIsCreated(false);
     handleCloseInterviewCreate();
+    window.location.reload();
   }
+
+  const handleCloseCreateInterviewTemplate = () => {
+    setIsInterviewTemplateOpen(false)
+  }
+
+  const handleTemplateCreate = () => {
+    handleCreateInterview(values, auth.id, makeID(), questions);
+    handleCloseCreateInterviewTemplate();
+}
 
   useEffect(() => {
     if(interviewTemplate) {
       setQuestions(interviewTemplate?.questions)
     }
   }, [interviewTemplate])
+
+  useEffect(() => {
+    if (isInterviewExist && isFormSubmitted) {
+  
+      if (isInterviewExist?.errorType === "candidatePosition" && isInterviewExist?.areEqual) {
+        setIsInterviewTemplateOpen(false);
+        return;
+      }
+  
+      if (isInterviewExist?.errorType === "ErrorByQuery" && isInterviewExist?.areEqual) {
+        setIsInterviewTemplateOpen(false);
+        handleCreateInterview(values, auth.id, makeID(), questions);
+      } else {
+        setIsInterviewTemplateOpen(true);
+      }
+
+      setIsFormSubmitted(false)
+    }
+  }, [isInterviewExist]); // React to changes in isInterviewExist
+  
 
 
   return (
@@ -124,44 +162,76 @@ function InterviewForm(props) {
             candidateEmail: '',
             question: '',
           }}
+          validationSchema={InterviewSchema}
           onSubmit={async (values) => {
             
-            await handleCreateInterview(values, auth.id, makeID(), questions)
+            //await handleCreateInterview(values, auth.id, makeID(), questions)
+            if(questions.length === 0) {
+              setQuestionError("You need to insert at least 1 question!")
+              return;
+            }
+
+            setQuestionError("")
+            setValues(values)
+            setIsFormSubmitted(true)
+            await checkInterview({questions, ...values})
           }}
         >
-          {() => (
+          {({ errors, touched }) => (
             <Form>
-              <div>
-                <Field
-                  id="candidatePosition"
-                  className="interview-input"
-                  name="candidatePosition"
-                  placeholder="Position"
-                  type="text"
-                />
-                <Field
-                  id="candidateFirstName"
-                  className="interview-input"
-                  name="candidateFirstName"
-                  placeholder="Candidate First Name"
-                  type="text"
-                />
+              <div style={{ display: "flex" }}>
+                <div>
+                  <Field
+                    id="candidatePosition"
+                    className="interview-input"
+                    name="candidatePosition"
+                    placeholder="Position"
+                    type="text"
+                  />
+                  {errors.candidatePosition && touched.candidatePosition ? (
+                    <div>{errors.candidatePosition}</div>
+                    ) : null}
+                </div>
+                <div>
+                  <Field
+                    id="candidateFirstName"
+                    className="interview-input"
+                    name="candidateFirstName"
+                    placeholder="Candidate First Name"
+                    type="text"
+                  />
+                  {errors.candidateFirstName && touched.candidateFirstName ? (
+                    <div>{errors.candidateFirstName}</div>
+                    ) : null}
+                </div>
+                
               </div>
-              <div>
-                <Field
-                  id="candidateLastName"
-                  className="interview-input"
-                  name="candidateLastName"
-                  placeholder="Candidate Last Name"
-                  type="text"
-                />
-                <Field
-                  id="candidateEmail"
-                  className="interview-input"
-                  name="candidateEmail"
-                  placeholder="jane@acme.com"
-                  type="email"
-                />
+              <div style={{ display: "flex" }}>
+                <div>
+                  <Field
+                    id="candidateLastName"
+                    className="interview-input"
+                    name="candidateLastName"
+                    placeholder="Candidate Last Name"
+                    type="text"
+                  />
+                  {errors.candidateLastName && touched.candidateLastName ? (
+                      <div>{errors.candidateLastName}</div>
+                      ) : null}
+                </div>
+                <div>
+                  <Field
+                    id="candidateEmail"
+                    className="interview-input"
+                    name="candidateEmail"
+                    placeholder="jane@acme.com"
+                    type="email"
+                  />
+                  {errors.candidateEmail && touched.candidateEmail ? (
+                        <div>{errors.candidateEmail}</div>
+                        ) : null}
+                </div>
+                
               </div>
                 <List sx={{ height: 400, overflowY: 'auto' }}>
                   <Stack spacing={0} direction="row">
@@ -188,13 +258,14 @@ function InterviewForm(props) {
                       </ListItem>
                   )}
                 </List>
-                
-              
+                <p>{questionsError}</p>
+                <p>{isInterviewExist?.errorType === "candidatePosition" && isInterviewExist?.areEqual ? isInterviewExist.errorText : ""}</p>
               <Button sx={{ width: 200 }} type="submit" variant='contained'>Create interview</Button>
               <Button sx={{ width: 200, marginLeft: 2 }} onClick={handleClose}>Cancel</Button>
             </Form>
           )}
         </Formik>
+        <InterviewTemplateCreate handleClose={handleCloseCreateInterviewTemplate} handleTemplateCreate={handleTemplateCreate} open={isInterviewTemplateOpen} />
         </Box>}
       </Modal>
         

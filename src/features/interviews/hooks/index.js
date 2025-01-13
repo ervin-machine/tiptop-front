@@ -37,3 +37,11 @@ export const interviewUpdate = (interview) => {
 export const getAnswer = (id) => {
     return api.get(`interview/audio/${id}`, { responseType: 'blob' })
 }
+
+export const interviewCheck = (interview) => {
+    console.log(interview)
+    const params = {
+        interview
+    }
+    return api.get(`interview/check`, {params})
+}

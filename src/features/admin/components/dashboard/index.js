@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 
 import InterviewCreate from '../../../interviews/components/interviewCreate';
 
-const Dashboard = ({ auth, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates }) => {
+const Dashboard = ({ auth, createInterview, shortUrl, createInterviewTemplate, fetchInterviewTemplates, interviewTemplates, checkInterview, isInterviewExist }) => {
   const [isInterviewCreateOpen, setInterviewCreateOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -55,6 +55,8 @@ const Dashboard = ({ auth, createInterview, shortUrl, createInterviewTemplate, f
         createInterviewTemplate={createInterviewTemplate}
         fetchInterviewTemplates={fetchInterviewTemplates}
         interviewTemplates={interviewTemplates}
+        checkInterview={checkInterview}
+        isInterviewExist={isInterviewExist}
       />
       
     </div>

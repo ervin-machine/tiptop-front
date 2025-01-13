@@ -8,6 +8,7 @@ export const initialState = {
     interview: [],
     shortUrl: null,
     error: null,
+    isInterviewExist: {},
 }
 
 const interviewReducer = (state = initialState, action) => 
@@ -75,6 +76,19 @@ const interviewReducer = (state = initialState, action) =>
                 draft.interviewTemplates = [...action.payload];
                 break;
             case types.GET_INTERVIEW_TEMPLATES_FAILURE:
+                draft.isLoading = false;
+                draft.error = action.payload.err;
+                break;
+            case types.CHECK_INTERVIEW_REQUEST:
+                draft.isLoading = true;
+                break;
+            case types.CHECK_INTERVIEW_SUCCESS:
+                draft.isLoading = false;
+                draft.error = null;
+                console.log(action.payload)
+                draft.isInterviewExist = action.payload;
+                break;
+            case types.CHECK_INTERVIEW_FAILURE:
                 draft.isLoading = false;
                 draft.error = action.payload.err;
                 break;

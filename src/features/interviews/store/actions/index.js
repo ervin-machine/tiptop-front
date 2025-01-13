@@ -1,5 +1,5 @@
 import { types } from "../constants"
-import { interviewCreate, getInterviews, getAnswer, interviewDelete, interviewTemplateCreate, getInterviewTemplates, getInterview, interviewUpdate } from '../../hooks'
+import { interviewCreate, getInterviews, getAnswer, interviewDelete, interviewTemplateCreate, getInterviewTemplates, getInterview, interviewUpdate, interviewCheck } from '../../hooks'
 
 const createInterviewRequest = () => {
   return {
@@ -134,6 +134,26 @@ const getInterviewTemplatesRequest = () => {
   const getInterviewTemplatesFailure = (err) => {
     return {
         type: types.GET_INTERVIEW_TEMPLATES_FAILURE,
+        payload: err
+    }
+  }
+
+  const interviewCheckRequest = () => {
+    return {
+        type: types.CHECK_INTERVIEW_REQUEST
+    }
+  }
+  
+  const interviewCheckSuccess = (data) => {
+    return {
+        type: types.CHECK_INTERVIEW_SUCCESS,
+        payload: data
+    }
+  }
+  
+  const interviewCheckFailure = (err) => {
+    return {
+        type: types.CHECK_INTERVIEW_FAILURE,
         payload: err
     }
   }
@@ -277,6 +297,22 @@ export const fetchInterview = (shortId) => {
         } catch (err) {
             console.error("Error fetching questions or processing answers:", err);
             dispatch(getInterviewFailure(err));
+        }
+    };
+};
+
+export const checkInterview = (interview) => {
+    return async (dispatch) => {
+        dispatch(interviewCheckRequest());
+        try {
+            const response = await interviewCheck(interview);
+            
+            dispatch(
+                interviewCheckSuccess(response.data)
+            );
+        } catch (err) {
+            console.error("Error check interveiw:", err);
+            dispatch(interviewCheckFailure(err));
         }
     };
 };
