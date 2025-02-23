@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import "./audioRecord.scss";
 import { Typography, Button, Container, Box, Stepper, Step, StepLabel } from "@mui/material";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import { io } from "socket.io-client";
+import axios from "axios";
 
 const timerProps = {
   isPlaying: true,
@@ -10,7 +12,9 @@ const timerProps = {
   strokeWidth: 6,
 };
 
-const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
+const socket = io("http://localhost:5000");
+
+const AudioRecorder = ({ questions, transcribeAudio, updateInterview, audioUpload }) => {
   // State Management
   const [activeStep, setActiveStep] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -72,21 +76,20 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
   };
 
   // Handle Navigation to Next Question
-  const handleNext = () => {
+  const handleNext = async () => {
     const nextStep = activeStep + 1;
     const formData = new FormData();
     formData.append("audio", audioBlob);
+    formData.append("socketId", socket.id); 
+    formData.append("activeStep", activeStep); 
+    formData.append("shortId", shortId); 
 
     setActiveStep(nextStep);
     setRecordCount(0);
     setSeconds(0);
     setTimer(0)
-    transcribeAudio(formData, activeStep, questions);
+    audioUpload(formData)
     setAudioBlob(null);
-
-    if (nextStep === questions.length) {
-      updateInterview(shortId, questions); // Update interview on completion
-    }
 
     localStorage.setItem("activeStep", JSON.stringify({ step: nextStep }));
   };
@@ -170,6 +173,10 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview }) => {
   
     checkActiveStepExpiration();
   }, []);
+
+  useEffect(() => {
+    console.log("Updated Questions in Redux:", questions);
+  }, [questions]);
 
   return (
     <Container>

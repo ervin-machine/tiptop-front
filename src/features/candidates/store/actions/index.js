@@ -55,6 +55,26 @@ const transcribeRequest = () => {
     }
   }
   
+  const uploadAudioFailure = (err) => {
+    return {
+        type: types.UPLOAD_AUDIO_FAILURE,
+        payload: err
+    }
+  }
+
+  const uploadAudioRequest = () => {
+    return {
+        type: types.UPLOAD_AUDIO_REQUEST
+    }
+  }
+  
+  const uploadAudioSuccess = (data) => {
+    return {
+        type: types.UPLOAD_AUDIO_SUCCESS,
+        payload: data
+    }
+  }
+  
   const updateInterviewFailure = (err) => {
     return {
         type: types.UPDATE_INTERVIEW_FAILURE,
@@ -108,30 +128,38 @@ export const updateInterview = (shortId, questions) => {
     }
 }
 
-export const transcribeAudio = (formData, activeStep, questions) => {
+export const audioUpload = (formData) => {
+    return async (dispatch) => {
+        dispatch(uploadAudioRequest())
+        try {
+            await uploadAudio(formData)
+            dispatch(uploadAudioSuccess())
+        } catch(err) {
+            dispatch(uploadAudioFailure(err))
+        }
+    }
+}
+
+export const transcribeAudio = (data, activeStep, questions) => {
     return async (dispatch) => {
         dispatch(transcribeRequest())
         try {
-            const uploadResponse = await uploadAudio(formData)
-            const transcriptId = uploadResponse.data.result.transcriptId;
-            const audioID = uploadResponse.data.result.audioID;
+            console.log("Before Update:", questions);
 
-            let transcriptionData;
-            do {
-                const response = await getTransccribe(transcriptId);
-                transcriptionData = response.data.data;
-            } while (transcriptionData.status !== "completed");
+            const updatedQuestions = questions.map((question) =>
+                question.id === activeStep
+                    ? { 
+                        ...question, 
+                        answer: data.uploadID, 
+                        transcribe: data.transcription, 
+                        summarization: data.summary 
+                    }
+                    : question
+            );
 
-            if(transcriptionData.status === "completed") {
-                const updatedQuestions = questions.map((question) => 
-                    question.id === activeStep ? { ...question, 
-                      answer: audioID,
-                      transcribe: transcriptionData.text,
-                      summarization: transcriptionData.summary 
-                    } : question
-                )
-                dispatch(transcribeSuccess({updatedQuestions: updatedQuestions }));
-            }
+            console.log("Updated Questions:", updatedQuestions);
+            
+            dispatch(transcribeSuccess({updatedQuestions: updatedQuestions }));
             
         } catch(err) {
             dispatch(transcribeFailure(err))

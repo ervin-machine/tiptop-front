@@ -16,7 +16,7 @@ const style = {
     p: 4,
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
   };
 
 function InterviewTemplateCreate(props) {

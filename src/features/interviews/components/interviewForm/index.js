@@ -94,6 +94,7 @@ function InterviewForm(props) {
 
   const handleCloseCreateInterviewTemplate = () => {
     setIsInterviewTemplateOpen(false)
+    handleCreateInterview(values, auth.id, makeID(), questions);
   }
 
   const handleTemplateCreate = () => {
@@ -147,6 +148,9 @@ function InterviewForm(props) {
             boxShadow: 24,
             p: 4,
             display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center"
             }}>
             <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
               Interview link: 
@@ -244,7 +248,7 @@ function InterviewForm(props) {
                       value={question}
                       onChange={handleQuestion }
                     />
-                    <Button onClick={handleQuestions}><AddIcon /></Button>
+                    <Button onClick={handleQuestions} disabled={question === ''}><AddIcon /></Button>
                   </Stack>
                   <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
                     Questions:

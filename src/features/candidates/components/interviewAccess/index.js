@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
 import { selectQuestions, selectTranscribe, selectSummarization, selectAudioId } from '../../store/selectors'
-import { interviewAccess, transcribeAudio, updateInterview, fetchAnswer } from '../../store/actions'
+import { interviewAccess, transcribeAudio, updateInterview, fetchAnswer, audioUpload } from '../../store/actions'
 
 import { Button } from '@mui/material'
 import Typography from '@mui/material/Typography';
@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import AudioRecorder from '../audioRecord'
 
 function InterviewAccess(props) {
-  const { interviewAccess, questions, transcribeAudio, updateInterview } = props;
+  const { interviewAccess, questions, transcribeAudio, updateInterview, audioUpload } = props;
   const [isInterviewStarted, setIsInterviewStarted] = useState(false)
   const { shortId } = useParams();
 
@@ -74,6 +74,7 @@ function InterviewAccess(props) {
           transcribeAudio={transcribeAudio} 
           updateInterview={updateInterview}
           shortId={shortId}
+          audioUpload={audioUpload}
         />}
     </div>
   )
@@ -99,6 +100,9 @@ const mapStateToProps = createStructuredSelector({
         },
         fetchAnswer: (questions) => {
           dispatch(fetchAnswer(questions))
+        },
+        audioUpload: (formData) => {
+          dispatch(audioUpload(formData))
         }
     }
   }

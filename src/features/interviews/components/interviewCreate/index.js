@@ -20,7 +20,9 @@ const style = {
     p: 4,
     display: "flex",
     flexDirection: "column",
-    alignItems: "center"
+    alignItems: "center",
+    height: 300,
+    overflowY: 'auto' 
   };
 
   const Item = styled(Paper)(({ theme }) => ({

@@ -37,13 +37,16 @@ const candidateReducer = (state = initialState, action) =>
                 draft.error = action.payload.err;
                 break;
             case types.UPDATE_INTERVIEW_REQUEST:
+            case types.UPLOAD_AUDIO_REQUEST:
                 draft.isLoading = true;
                 break;
             case types.UPDATE_INTERVIEW_SUCCESS:
+            case types.UPLOAD_AUDIO_SUCCESS:
                 draft.isLoading = false;
                 draft.error = null;
                 break;
             case types.UPDATE_INTERVIEW_FAILURE:
+            case types.UPLOAD_AUDIO_FAILURE:
                 draft.isLoading = false;
                 draft.error = action.payload.err;
                 break;
