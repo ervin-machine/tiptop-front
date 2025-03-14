@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import "./audioRecord.scss";
 import { Typography, Button, Container, Box, Stepper, Step, StepLabel } from "@mui/material";
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
-import { io } from "socket.io-client";
 import axios from "axios";
 
 const timerProps = {
@@ -11,8 +10,6 @@ const timerProps = {
   size: 200,
   strokeWidth: 6,
 };
-
-const socket = io("http://localhost:5000");
 
 const AudioRecorder = ({ questions, transcribeAudio, updateInterview, audioUpload }) => {
   // State Management
@@ -80,7 +77,6 @@ const AudioRecorder = ({ questions, transcribeAudio, updateInterview, audioUploa
     const nextStep = activeStep + 1;
     const formData = new FormData();
     formData.append("audio", audioBlob);
-    formData.append("socketId", socket.id); 
     formData.append("activeStep", activeStep); 
     formData.append("shortId", shortId); 
 
