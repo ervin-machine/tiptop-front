@@ -94,7 +94,8 @@ function InterviewForm(props) {
 
   const handleCloseCreateInterviewTemplate = () => {
     setIsInterviewTemplateOpen(false)
-    handleCreateInterview(values, auth.id, makeID(), questions);
+    setIsCreated(true);
+    createInterview(auth.id, values.candidatePosition, values.candidateFirstName, values.candidateLastName, values.candidateEmail, makeID(), questions)
   }
 
   const handleTemplateCreate = () => {
