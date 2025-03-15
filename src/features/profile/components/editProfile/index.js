@@ -49,13 +49,13 @@ function EditProfile(props) {
         <Box sx={style}>
         <Formik
           initialValues={{
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+            email: user?.email,
             password: '',
-            phone: user.phone,
-            companyName: user.companyName,
-            companyPosition: user.companyPosition
+            phone: user?.phone,
+            companyName: user?.companyName,
+            companyPosition: user?.companyPosition
           }}
           onSubmit={handleSubmit}
         >
